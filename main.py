@@ -62,12 +62,14 @@ draw_image = np.copy(image)
 # image you are searching is a .jpg (scaled 0 to 255)
 # image = image.astype(np.float32)/255
 
-windows = slide_window(image, x_start_stop=[None, image.shape[1]], y_start_stop=[375, 700], 
-                    xy_window=(64, 64), xy_overlap=(0.5, 0.5))
-windows1 = slide_window(image, x_start_stop=[0, image.shape[1]], y_start_stop=[375, 700],
-                    xy_window=(96, 96), xy_overlap=(0.5, 0.5))
-windows2 = slide_window(image, x_start_stop=[0, image.shape[1]], y_start_stop=[375, 700],
-                    xy_window=(100, 100), xy_overlap=(0.30, 0.30))
+windows = slide_window(image, x_start_stop=[400, 1275], y_start_stop=[400, 580], 
+                    xy_window=(180, 180), xy_overlap=(0.7, 0))
+windows1 = slide_window(image, x_start_stop=[400, 1275], y_start_stop=[400, 570],
+                    xy_window=(100, 100), xy_overlap=(0.9, 0.9))
+windows2 = slide_window(image, x_start_stop=[600, 900], y_start_stop=[400, 450],
+                    xy_window=(50, 50), xy_overlap=(0.50, 0.50))
+windows3 = slide_window(image, x_start_stop=[600, 900], y_start_stop=[395, 430],
+                    xy_window=(35, 35), xy_overlap=(0.50, 0.50))
 # windows3 = slide_window(image, x_start_stop=[0, image.shape[1]], y_start_stop=[image.shape[0]//2, image.shape[0]],
 #                   xy_window=(256, 256), xy_overlap=(0.75, 0.75))
 
@@ -76,6 +78,9 @@ for window in windows1:
     windows.append(window)
 
 for window in windows2:
+    windows.append(window)
+
+for window in windows3:
     windows.append(window)
 
 

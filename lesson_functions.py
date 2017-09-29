@@ -165,8 +165,6 @@ def add_heat(heatmap, bbox_list):
         heatmap[box[0][1]:box[1][1], box[0][0]:box[1][0]] += 1
 
     # Return updated heatmap
-    print("box list :", bbox_list)
-    print("heat map :", heatmap)
     return heatmap# Iterate through list of bboxes
     
 def apply_threshold(heatmap, threshold):

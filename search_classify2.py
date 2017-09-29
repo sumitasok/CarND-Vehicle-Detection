@@ -218,4 +218,10 @@ Using: 9 orientations 8 pixels per cell and 2 cells per block
 Feature vector length: 2580
 11.73 Seconds to train SVC...
 Test Accuracy of SVC =  0.9741
+
+Using: 9 orientations 8 pixels per cell and 2 cells per block
+Feature vector length: 2580
+7.03 Seconds to train SVC...
+Test Accuracy of SVC =  0.9814
+timestamp:  1506679413
 '''
