@@ -5,8 +5,11 @@ import matplotlib.image as mpimg
 from sklearn.preprocessing import StandardScaler
 import glob
 from sklearn.model_selection import train_test_split
-from sklearn.svm import LinearSVC
+from sklearn.svm import LinearSVC, SVC
 import time
+import scipy
+import pickle
+from lesson_functions import *
 
 # Define a function to compute binned color features  
 def bin_spatial(img, size=(32, 32)):
@@ -61,17 +64,13 @@ def extract_features(imgs, cspace='RGB', spatial_size=(32, 32),
     # Return list of feature vectors
     return features
 
-images = glob.glob('data/vehicles/**/*.png')
-non_car_images = glob.glob('data/non-vehicles/**/*.png')
-
-print("image count", len(images), )
+images = glob.glob('input/vehicles/**/*.png')
+non_car_images = glob.glob('input/non-vehicles/**/*.png')
 
 cars = []
 notcars = []
 for image in images:
-    # if 'image' in image:
     cars.append(image)
-    # else:
 for image in non_car_images:
     notcars.append(image)
 
@@ -82,11 +81,13 @@ spatial = 32
 histbin = 32
         
 t = time.time()
-car_features = extract_features(cars, cspace='RGB', spatial_size=(32, 32),
+car_features = extract_features(cars, cspace='YCrCb', spatial_size=(32, 32),
                         hist_bins=32, hist_range=(0, 256))
-notcar_features = extract_features(notcars, cspace='RGB', spatial_size=(32, 32),
+notcar_features = extract_features(notcars, cspace='YCrCb', spatial_size=(32, 32),
                         hist_bins=32, hist_range=(0, 256))
 print(round(time.time()-t, 2), 'Seconds to extract features')
+timestamp = str(int(time.time()))
+print("Extraction configurations: \n\t color space used = 'YCrCb'\n\t spacial size used is 32x32\n\thistogram range (0, 256)\n\t timestamp ", timestamp)
 
 if len(car_features) > 0:
 
@@ -112,10 +113,9 @@ if len(car_features) > 0:
     print('Using spatial binning of:',spatial,
         'and', histbin,'histogram bins')
 
-    pickle_file = "data/LinearSVC_histbin_32_spacial_32.pkl"
+    pickle_file = "input/LinearSVC_histbin_32_spacial_32_"+timestamp+".pkl"
     # http://scikit-learn.org/stable/modules/model_persistence.html
     from sklearn.externals import joblib
-    '''
 
     svc = LinearSVC()
     t=time.time()
@@ -124,46 +124,48 @@ if len(car_features) > 0:
     print(round(t2-t, 2), 'Seconds to train SVC...')
 
 
+    # print("svc data: ", pickle.dumps(svc))
+
     joblib.dump(svc, pickle_file)
     t3 = time.time()
     print(round(t3-t2, 2), 'Seconds to save SVC...')
-    '''
+
     t3 = time.time()
     svc = joblib.load(pickle_file)
     t4 = time.time()
     print(round(t4-t3, 2), 'Seconds to load SVC...')
-    # print('Test Accuracy of SVC = ', svc.score(X_test, y_test))
+    print('Test Accuracy of SVC = ', svc.score(X_test, y_test))
 
-    # print('My SVC predicts: ', svc.predict(X_test[0:10]))
-    # print('For labels: ', y_test[0:10])
+    print('My SVC predicts: ', svc.predict(X_test[0:10]))
+    print('For labels: ', y_test[0:10])
 
     print('Test Accuracy of SVC = ', round(svc.score(X_test, y_test), 4))
     # Check the prediction time for a single sample
-    '''
+    # '''
     t=time.time()
     n_predict = 10
     print('My SVC predicts: ', svc.predict(X_test[0:n_predict]))
     print('For these',n_predict, 'labels: ', y_test[0:n_predict])
     t2 = time.time()
     print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
-    '''
+    # '''
 
     # with LinearSVC got 0.929898648649
     # Test Accuracy of SVC =  0.929898648649
     # Test Accuracy of SVC =  0.93384009009
 
-    fig = plt.figure(figsize=(12,4))
-    plt.subplot(131)
-    plt.imshow(mpimg.imread(cars[car_ind]))
-    plt.title('Original Image')
-    plt.subplot(132)
-    plt.plot(X[car_ind])
-    plt.title('Raw Features')
-    plt.subplot(133)
-    plt.plot(scaled_X[car_ind])
-    plt.title('Normalized Features')
-    fig.tight_layout()
-    plt.savefig("data/hog/test1_combine_and_normalize"+str(car_ind)+".jpg")
+    # fig = plt.figure(figsize=(12,4))
+    # plt.subplot(131)
+    # plt.imshow(mpimg.imread(cars[car_ind]))
+    # plt.title('Original Image')
+    # plt.subplot(132)
+    # plt.plot(X[car_ind])
+    # plt.title('Raw Features')
+    # plt.subplot(133)
+    # plt.plot(scaled_X[car_ind])
+    # plt.title('Normalized Features')
+    # fig.tight_layout()
+    # plt.savefig("input/hog/test1_combine_and_normalize"+str(car_ind)+".jpg")
 else: 
     print('Your function only returns empty feature vectors...')
 
@@ -214,7 +216,7 @@ def slide_window(img, x_start_stop=[None, None], y_start_stop=[None, None],
     return window_list
 
 
-img = mpimg.imread("data/test1.jpg")
+img = mpimg.imread("input/test1.jpg")
 windows = slide_window(img, x_start_stop=[0, img.shape[1]], y_start_stop=[0,img.shape[0]//2], xy_window=(64, 64), xy_overlap=(0.5, 0.5))
 # print("windows", windows)
 
@@ -226,6 +228,7 @@ def draw_boxes(img, bboxes, color=(0, 0, 255), thick=6):
         # Draw a rectangle given bbox coordinates
         cv2.rectangle(imcopy, bbox[0], bbox[1], color, thick)
     # Return the image copy with boxes drawn
+    scipy.misc.imsave('input/images/'+str(int(time.time()))+'.jpg', imcopy)
     return imcopy
 
 img = draw_boxes(img, windows)
@@ -233,7 +236,7 @@ fig = plt.figure(figsize=(12,4))
 plt.subplot(131)
 plt.imshow(img)
 plt.title('Boxes on images')
-plt.savefig("data/boxes.jpg")
+plt.savefig("input/boxes.jpg")
 
 
 '''
@@ -248,3 +251,122 @@ My SVC predicts:  [ 1.  1.  0.  1.  0.  1.  0.  0.  0.  0.]
 For these 10 labels:  [ 1.  1.  0.  1.  0.  1.  0.  1.  0.  0.]
 0.00174 Seconds to predict 10 labels with SVC
 '''
+
+
+
+
+color_space = 'YCrCb'
+spatial_size = (spatial, spatial)
+hist_bins = histbin
+# orient = 
+# pix_per_cell = data['pix_per_cell']
+# cell_per_block = data['cell_per_block']
+# hog_channel = data['hog_channel']
+# spatial_feat = data['spatial_feat']
+# hist_feat = data['hist_feat']
+# hog_feat = data['hog_feat']
+
+# color_space = 'RGB' # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
+orient = 9  # HOG orientations
+pix_per_cell = 8 # HOG pixels per cell
+cell_per_block = 2 # HOG cells per block
+hog_channel = 0 # Can be 0, 1, 2, or "ALL"
+# spatial_size = (16, 16) # Spatial binning dimensions
+# hist_bins = 16    # Number of histogram bins
+spatial_feat = True # Spatial features on or off
+hist_feat = False # Histogram features on or off
+hog_feat = False # HOG features on or off
+y_start_stop = [None, None]
+
+
+image = mpimg.imread('input/test1.jpg')
+draw_image = np.copy(image)
+
+# Uncomment the following line if you extracted training
+# data from .png images (scaled 0 to 1 by mpimg) and the
+# image you are searching is a .jpg (scaled 0 to 255)
+# image = image.astype(np.float32)/255
+
+
+
+def process_image(image):
+    windows = slide_window(image, x_start_stop=[None, image.shape[1]], y_start_stop=[375, 700], 
+                        xy_window=(64, 64), xy_overlap=(0.5, 0.5))
+    windows1 = slide_window(image, x_start_stop=[0, image.shape[1]], y_start_stop=[375, 700],
+                        xy_window=(96, 96), xy_overlap=(0.5, 0.5))
+    windows2 = slide_window(image, x_start_stop=[0, image.shape[1]], y_start_stop=[375, 700],
+                        xy_window=(100, 100), xy_overlap=(0.30, 0.30))
+    # windows3 = slide_window(image, x_start_stop=[0, image.shape[1]], y_start_stop=[image.shape[0]//2, image.shape[0]],
+    #                   xy_window=(256, 256), xy_overlap=(0.75, 0.75))
+
+
+    for window in windows1:
+        windows.append(window)
+
+    for window in windows2:
+        windows.append(window)
+
+    # for window in windows3:
+    #     windows.append(window)
+
+    hot_windows = search_windows(image, windows, svc, X_scaler, color_space=color_space, 
+                            spatial_size=spatial_size, hist_bins=hist_bins, 
+                            orient=orient, pix_per_cell=pix_per_cell, 
+                            cell_per_block=cell_per_block, 
+                            hog_channel=hog_channel, spatial_feat=spatial_feat, 
+                            hist_feat=hist_feat, hog_feat=hog_feat)                       
+
+    # draw_boxes(draw_image, windows, color=(0, 0, 255), thick=6)
+    # draw_boxes(draw_image, windows1, color=(0, 0, 255), thick=6)
+    # draw_boxes(draw_image, windows2, color=(0, 0, 255), thick=6)
+    window_img = draw_boxes(draw_image, hot_windows, color=(0, 0, 255), thick=6)
+
+    # plt.imshow(window_img)
+    # plt.savefig("input/hot.jpg")
+
+    # Read in a pickle file with bboxes saved
+    # Each item in the "all_bboxes" list will contain a 
+    # list of boxes for one of the images shown above
+    # box_list = pickle.load( open( "bbox_pickle.p", "rb" ))
+
+    heat = np.zeros_like(image[:,:,0]).astype(np.float)
+
+    # Add heat to each box in box list
+    heat = add_heat(heat,hot_windows)
+        
+    # Apply threshold to help remove false positives
+    heat = apply_threshold(heat,1)
+
+    # Visualize the heatmap when displaying    
+    heatmap = np.clip(heat, 0, 255)
+
+    # Find final boxes from heatmap using label function
+    labels = label(heatmap)
+    draw_img = draw_labeled_bboxes(np.copy(image), labels)
+    return draw_img
+
+
+# white_output = 'input/car_detection.mp4'
+# clip1 = VideoFileClip("input/test_video.mp4")
+# white_clip = clip1.fl_image(process_image) #NOTE: this function expects color images!!
+# white_clip.write_videofile(white_output, audio=False)
+import scipy.misc
+images = glob.glob('input/video/*.jpg')
+
+for image in images:
+    img = mpimg.imread(image)
+    t3 = time.time()
+    draw_image = process_image(img)
+    t4 = time.time()
+    print(round(t4-t3, 2), ' Seconds to process ', image)
+    scipy.misc.imsave('input/images/'+image.split("/")[-1], draw_image)
+# fig = plt.figure()
+# plt.subplot(121)
+# plt.imshow(draw_img)
+# plt.title('Window')
+# plt.subplot(122)
+# plt.imshow(heatmap, cmap='hot')
+# plt.title('HOG')
+# fig.tight_layout()
+# plt.savefig("input/heat.jpg")
+

@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import glob
 
 def png_conv():
-	images = glob.glob('data/vehicles/**/*.png')
-	non_car_images = glob.glob('data/non-vehicles/**/*.png')
+	images = glob.glob('input/vehicles/**/*.png')
+	non_car_images = glob.glob('input/non-vehicles/**/*.png')
 
 	print("image count", len(images))
 
@@ -25,7 +25,7 @@ def png_conv():
 	print("scale", (img * 255).astype('uint8'))
 
 
-	img = mpimg.imread("data/test1.jpg")
+	img = mpimg.imread("input/test1.jpg")
 
 def draw_all_boxes(img):
 	windows = slide_window(img, x_start_stop=[0, img.shape[1]], y_start_stop=[img.shape[0]//2, (img.shape[0]//4)*3], xy_window=(64, 64), xy_overlap=(0.5, 0.5))
@@ -52,7 +52,7 @@ def draw_all_boxes(img):
 
 
 
-	plt.savefig("data/boxes.jpg")
+	plt.savefig("input/boxes.jpg")
 
 def draw_boxes(img, bboxes, color=(0, 0, 255), thick=6):
     # Make a copy of the image
@@ -108,4 +108,4 @@ def slide_window(img, x_start_stop=[None, None], y_start_stop=[None, None],
     # Return the list of windows
     return window_list
 
-draw_all_boxes(mpimg.imread("data/test1.jpg"))
+draw_all_boxes(mpimg.imread("input/test1.jpg"))

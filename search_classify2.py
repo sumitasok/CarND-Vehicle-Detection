@@ -17,8 +17,8 @@ from sklearn.cross_validation import train_test_split
 # This function is very similar to extract_features()
 # just for a single image rather than list of images
 
-images = glob.glob('data/vehicles/**/*.png')
-non_car_images = glob.glob('data/non-vehicles/**/*.png')
+images = glob.glob('input/vehicles/**/*.png')
+non_car_images = glob.glob('input/non-vehicles/**/*.png')
 
 print("image count", len(images), )
 
@@ -108,7 +108,8 @@ print('Test Accuracy of SVC = ', round(svc.score(X_test, y_test), 4))
 # Check the prediction time for a single sample
 t=time.time()
 
-pickle_file = "data/LinearSVC_histbin_32_spacial_32_hog.pkl"
+print("timestamp: ", str(int(t)))
+pickle_file = "input/LinearSVC_histbin_32_spacial_32_hog_"+str(int(t))+".pkl"
 # http://scikit-learn.org/stable/modules/model_persistence.html
 from sklearn.externals import joblib
 data = {'svc': svc,
@@ -142,7 +143,7 @@ hist_feat = data['hist_feat']
 hog_feat = data['hog_feat']
 
 
-image = mpimg.imread('data/test1.jpg')
+image = mpimg.imread('input/test1.jpg')
 draw_image = np.copy(image)
 
 # Uncomment the following line if you extracted training
@@ -176,7 +177,7 @@ hot_windows = search_windows(image, windows, svc, X_scaler, color_space=color_sp
 window_img = draw_boxes(draw_image, hot_windows, color=(0, 0, 255), thick=6)                    
 
 plt.imshow(window_img)
-plt.savefig("data/hot.jpg")
+plt.savefig("input/hot.jpg")
 
 # Read in a pickle file with bboxes saved
 # Each item in the "all_bboxes" list will contain a 
@@ -206,7 +207,7 @@ plt.subplot(122)
 plt.imshow(heatmap, cmap='hot')
 plt.title('HOG')
 fig.tight_layout()
-plt.savefig("data/heat.jpg")
+plt.savefig("input/heat.jpg")
 
 
 

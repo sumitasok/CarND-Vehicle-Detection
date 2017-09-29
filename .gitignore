@@ -1,5 +1,7 @@
 data/
+input
 input/
+output
 output/
 *.mp4
 __pycache__

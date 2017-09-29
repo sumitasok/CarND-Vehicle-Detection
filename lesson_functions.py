@@ -5,6 +5,7 @@ from skimage.feature import hog
 import matplotlib.pyplot as plt
 from scipy.ndimage.measurements import label
 import time
+import scipy
 
 # Define a function to return HOG features and visualization
 def get_hog_features(img, orient, pix_per_cell, cell_per_block, 
@@ -149,9 +150,10 @@ def draw_boxes(img, bboxes, color=(0, 0, 255), thick=6):
     # Make a copy of the image
     imcopy = np.copy(img)
     # Iterate through the bounding boxes
-    for bbox in bboxes:
+    for i, bbox in enumerate(bboxes):
         # Draw a rectangle given bbox coordinates
         cv2.rectangle(imcopy, bbox[0], bbox[1], color, thick)
+    # scipy.misc.imsave('input/images/'+str(int(time.time()))+'.jpg', imcopy)
     # Return the image copy with boxes drawn
     return imcopy
 
@@ -163,6 +165,8 @@ def add_heat(heatmap, bbox_list):
         heatmap[box[0][1]:box[1][1], box[0][0]:box[1][0]] += 1
 
     # Return updated heatmap
+    print("box list :", bbox_list)
+    print("heat map :", heatmap)
     return heatmap# Iterate through list of bboxes
     
 def apply_threshold(heatmap, threshold):
@@ -230,15 +234,15 @@ def single_img_features(img, color_space='RGB', spatial_size=(32, 32),
         #8) Append features to list
         img_features.append(hog_features)
 
-        fig = plt.figure()
-        plt.subplot(121)
-        plt.imshow(img)
-        plt.title('Car Positions')
-        plt.subplot(122)
-        plt.imshow(m, cmap='hot')
-        plt.title('Heat Map')
-        fig.tight_layout()
-        plt.savefig("data/hog_windows/"+str(time.time())+"-hog.jpg")
+        # fig = plt.figure()
+        # plt.subplot(121)
+        # plt.imshow(img)
+        # plt.title('Car Positions')
+        # plt.subplot(122)
+        # plt.imshow(m, cmap='hot')
+        # plt.title('Heat Map')
+        # fig.tight_layout()
+        # plt.savefig("data/hog_windows/"+str(time.time())+"-hog.jpg")
 
     #9) Return concatenated array of features
     return np.concatenate(img_features)
