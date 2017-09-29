@@ -33,26 +33,7 @@ for image in non_car_images:
 print("car image count", len(cars))
 print("non car image count", len(notcars))
 
-'''    
-# Read in cars and notcars
-images = glob.glob('*.jpeg')
-cars = []
-notcars = []
-for image in images:
-    if 'image' in image or 'extra' in image:
-        notcars.append(image)
-    else:
-        cars.append(image)
-
-# Reduce the sample size because
-# The quiz evaluator times out after 13s of CPU time
-sample_size = 500
-cars = cars[0:sample_size]
-notcars = notcars[0:sample_size]
-'''
-
 ### TODO: Tweak these parameters and see how the results change.
-color_space = 'RGB' # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
 color_space = 'YCrCb' # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
 orient = 9  # HOG orientations
 pix_per_cell = 8 # HOG pixels per cell
@@ -126,6 +107,12 @@ data = {'svc': svc,
 'hog_feat': hog_feat}
 
 joblib.dump(data, pickle_file)
+
+
+# Below code was used to create images of heat map.
+# the code in this file is relavant till here only.
+
+
 
 data = joblib.load(pickle_file)
 

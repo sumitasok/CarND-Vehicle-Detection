@@ -15,30 +15,14 @@ import pickle
 
 # pickle_file = "input/LinearSVC_histbin_32_spacial_32_1506671036.pkl"
 # pickle_file = "input/LinearSVC_histbin_32_spacial_32_2017Jul.pkl"
-pickle_file = "input/LinearSVC_histbin_32_spacial_32_hog__2017Jul.pkl"
+# pickle_file = "input/LinearSVC_histbin_32_spacial_32_hog__2017Jul.pkl"
 # pickle_file = "input/LinearSVC_histbin_32_spacial_32_1506673466.pkl"
 # pickle_file = "input/LinearSVC_histbin_32_spacial_32_1506673702.pkl"
-pickle_file = "input/LinearSVC_histbin_32_spacial_32_hog1506679413.pkl"
+pickle_file = "LinearSVC_histbin_32_spacial_32_hog1506679413.pkl" # this is the best result yet in this code base.
 # http://scikit-learn.org/stable/modules/model_persistence.html
 from sklearn.externals import joblib
 
 data = joblib.load(pickle_file)
-
-# print("svc :", data)
-
-# svc = data
-
-# data = dict()
-# data['color_space'] = 'YCrCb'
-# data['hist_bins'] = 32
-# data['orient'] = 9
-# data['pix_per_cell'] = 8
-# data['cell_per_block'] = 2
-# data['hog_channel'] = 'ALL'
-# data['spatial_feat'] = False
-# data['hist_feat'] = True
-# data['hog_feat'] = True
-# data['spatial_size'] = (16, 16)
 
 svc = data['svc']
 X_scaler = data['X_scaler']
@@ -70,9 +54,6 @@ windows2 = slide_window(image, x_start_stop=[600, 900], y_start_stop=[400, 450],
                     xy_window=(50, 50), xy_overlap=(0.50, 0.50))
 windows3 = slide_window(image, x_start_stop=[600, 900], y_start_stop=[395, 430],
                     xy_window=(35, 35), xy_overlap=(0.50, 0.50))
-# windows3 = slide_window(image, x_start_stop=[0, image.shape[1]], y_start_stop=[image.shape[0]//2, image.shape[0]],
-#                   xy_window=(256, 256), xy_overlap=(0.75, 0.75))
-
 
 for window in windows1:
     windows.append(window)
@@ -93,9 +74,6 @@ def process_image(image):
                             hist_feat=hist_feat, hog_feat=hog_feat)                       
 
     window_img = draw_boxes(draw_image, hot_windows, color=(0, 0, 255), thick=6)
-
-    # plt.imshow(window_img)
-    # plt.savefig("input/hot.jpg")
 
     # Read in a pickle file with bboxes saved
     # Each item in the "all_bboxes" list will contain a 
@@ -119,27 +97,8 @@ def process_image(image):
     return draw_img
 
 
-# white_output = 'input/car_detection.mp4'
-# clip1 = VideoFileClip("input/test_video.mp4")
-# white_clip = clip1.fl_image(process_image) #NOTE: this function expects color images!!
-# white_clip.write_videofile(white_output, audio=False)
-import scipy.misc
-images = glob.glob('input/video/*.jpg')
-
-for image in images:
-    img = mpimg.imread(image)
-    t3 = time.time()
-    draw_image = process_image(img)
-    t4 = time.time()
-    print(round(t4-t3, 2), ' Seconds to process ', image)
-    scipy.misc.imsave('input/images/'+image.split("/")[-1], draw_image)
-# fig = plt.figure()
-# plt.subplot(121)
-# plt.imshow(draw_img)
-# plt.title('Window')
-# plt.subplot(122)
-# plt.imshow(heatmap, cmap='hot')
-# plt.title('HOG')
-# fig.tight_layout()
-# plt.savefig("input/heat.jpg")
+white_output = 'input/car_detection.mp4'
+clip1 = VideoFileClip("input/test_video.mp4")
+white_clip = clip1.fl_image(process_image) #NOTE: this function expects color images!!
+white_clip.write_videofile(white_output, audio=False)
 
